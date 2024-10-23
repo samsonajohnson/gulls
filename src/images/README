@@ -1,0 +1,28 @@
+Contents:
+
+- precompute_psf.cpp : generate a gulls PSF from a text file
+-- can extract the text file psf from a fits file
+- txt2fits.cpp : convert txt grid to a fits file
+
+
+## Course Files for Image Simulations
+
+To improve separation ability, dithering may be used by `freeColour` to remove noise and artifacts. This is enabled by custom `.course` files which list sets of day,x,y,theta waypoints for images to be captured. These `.course` files are specified in each line of the detector list file.
+
+Day is simply the timestamp of the image capture in days; the baseline day 0 is arbitrary. Lateral x,y coordinates are doubles in terms of pixel coordinates. For example, 0.5 represents a half pixel offset from the origin. Angle theta is measured as the CCW (counter-clockwise) angle of the images axes relative to the x,y grid in degrees. Rotation is centered around the exact center of the image.
+
+The day,x,y,theta coordinates are separated by a space and each line ends in a new line character. A list of these is used to specify the sequential path the dithering follows. For example, one such path could be
+
+```
+32.5 0.25 0.25 30.0 
+33.6 0.6 0.0 19.2 
+35.4 -1.1 0.9 51.4 
+```
+
+Note how the (x,y) origin doesn't have to be the first point, or even used at all. Similarly, the theta doesn't even have to be set to 0 degrees, nor does the day have to start at 0 days. Since offsets are relative and star layouts are random, absolute coordinates are meaningless. Also, even negative numbers can be used.
+
+NOTE: A `.course` file MUST be supplied, even if it is trivial. Here is an example of a trivial path for stationary images
+
+```
+0.0 0.0 0.0 0.0 
+```

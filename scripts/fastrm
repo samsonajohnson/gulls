@@ -1,0 +1,4 @@
+#!/bin/bash
+
+perl -e 'opendir D,"."; while($n=readdir D){unlink $n;}'
+#perl -e 'opendir D,"."; while($n=readdir D){print "$n\n";unlink $n;}'
