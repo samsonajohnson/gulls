@@ -238,7 +238,7 @@ if not args.recut:
 
     if rates['norm_correction'].sum()>0:
         print("Warning: Some files changed between passes and the rates and normalization for these fields are corrupted. Fields affected:")
-        print(rates[rates['norm_correction']>0][['Field','SubRun']])
+        print(rates[rates['norm_correction']>0].index)
         print("A future version of this script will remove affected data")
 
 
