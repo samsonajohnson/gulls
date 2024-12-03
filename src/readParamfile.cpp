@@ -104,13 +104,17 @@ void readParamfile(char *v_file, struct filekeywords *Paramfile){
   //I should write a separate function, but for as few a times as we need this work 
   //around, I am just going to write it in.
 
-
+  //adding some logic such that if '/' is the first character of the _dir string, it will treat it as an absolute path.
+  //else, it will be treated as a relative path from GULLS_BASE_DIR
+  
   //for observatories
   //[0] is obsdir
   //errsum += read_config_var(v_file, keywords[0], Paramfile->obsdir);
   errsum += read_config_var(v_file, keywords[0], temp);
-  //need to first cat on the base directory
-  strcpy(Paramfile->obsdir,Paramfile->basedir);
+  //need to first cat on the base directory if it is not an absolute path
+  if(temp[0] != '/'){
+    strcat(Paramfile->obsdir,Paramfile->basedir);
+  }
   //then we cat on the actual directory
   strcat(Paramfile->obsdir,temp);
 
@@ -131,12 +135,30 @@ void readParamfile(char *v_file, struct filekeywords *Paramfile){
   //[5] is weatherdir
   //errsum += read_config_var(v_file, keywords[5], Paramfile->weatherprofiledir);
   errsum += read_config_var(v_file, keywords[5], temp);
-  strcpy(Paramfile->weatherprofiledir,Paramfile->basedir);
+  if(temp[0] != '/'){
+    strcat(Paramfile->weatherprofiledir,Paramfile->basedir);
+  }
   strcat(Paramfile->weatherprofiledir,temp);
 
   errsum += read_config_var(v_file, keywords[6], Paramfile->run_name);
-  //left output dir separate from restructuring for now
-  errsum += read_config_var(v_file, keywords[7], Paramfile->outputdir);
+
+  //Adding a catch to check if OUTPUT_DIR is an enviornmental variable or not
+  //define temp output variable
+  char outputtemp[1000];
+  // read in from parameter file to temp variable
+  errsum += read_config_var(v_file, keywords[7], outputtemp);
+  // we assume $ in first element means outputtemp is enviornment variable
+  // if first character is not dollar sign, read in normally
+  if (outputtemp[0] != '$'){
+    errsum += read_config_var(v_file, keywords[7], Paramfile->outputdir);
+  }
+  // if first element is $, remove first char and set equal to enviornment variable
+  else{
+    memmove(outputtemp, outputtemp + 1, sizeof outputtemp - 1);
+    Paramfile->outputdir = std::getenv(outputtemp);
+  }
+
+  
   if(read_config_var(v_file, keywords[8], str0)) //principle obs
     {
       str0[0]='0'; str0[1]='\0';
@@ -151,9 +173,11 @@ void readParamfile(char *v_file, struct filekeywords *Paramfile){
   //[10] is starfielddir
   //errsum += read_config_var(v_file, keywords[10], Paramfile->starfielddir);
   errsum += read_config_var(v_file, keywords[10], temp);
-  strcpy(Paramfile->starfielddir,Paramfile->starsdir);
+  if(temp[0] != '/'){
+    strcat(Paramfile->starfielddir,Paramfile->starsdir);
+  }
   strcat(Paramfile->starfielddir,temp);
-
+  
   //[11] is starfieldlist
   //errsum += read_config_var(v_file, keywords[11], Paramfile->starfieldlist);
   errsum += read_config_var(v_file, keywords[11], temp);
@@ -163,7 +187,9 @@ void readParamfile(char *v_file, struct filekeywords *Paramfile){
   //[12] is sourcedir
   //errsum += read_config_var(v_file, keywords[12], Paramfile->sourcedir);
   errsum += read_config_var(v_file, keywords[12], temp);
-  strcpy(Paramfile->sourcedir,Paramfile->starsdir);
+  if(temp[0] != '/'){
+    strcat(Paramfile->sourcedir,Paramfile->starsdir);
+  }
   strcat(Paramfile->sourcedir,temp);
 
   //[13] is sourcelist
@@ -178,13 +204,14 @@ void readParamfile(char *v_file, struct filekeywords *Paramfile){
       cerr << "Setting " << keywords[14] << " to 0 by default" << endl;
     }
 
-
   //[15] is lensdir
   //errsum += read_config_var(v_file, keywords[15], Paramfile->lensdir);
   errsum += read_config_var(v_file, keywords[15], temp);
-  strcpy(Paramfile->lensdir,Paramfile->starsdir);
+  if(temp[0] != '/'){
+    strcat(Paramfile->lensdir,Paramfile->starsdir);
+  }
   strcat(Paramfile->lensdir,temp);
-
+  
   //[16] is lenslist
   //errsum += read_config_var(v_file, keywords[16], Paramfile->lenslist);
   errsum += read_config_var(v_file, keywords[16], temp);
@@ -201,7 +228,10 @@ void readParamfile(char *v_file, struct filekeywords *Paramfile){
   //[18] is planetdir
   //errsum += read_config_var(v_file, keywords[18], Paramfile->planetdir);
   errsum += read_config_var(v_file, keywords[18], temp);
-  strcpy(Paramfile->planetdir,Paramfile->basedir);
+  if(temp[0] != '/'){
+    // XXX Should this be starsdir by default? Was basedir, but I imagine most people will have these dirs grouped. 
+    strcat(Paramfile->planetdir,Paramfile->starsdir);
+  }
   strcat(Paramfile->planetdir,temp);
 
   errsum += read_config_var(v_file, keywords[19], Paramfile->planetroot); 

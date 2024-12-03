@@ -1,6 +1,6 @@
 #Options
 
-BASEDIR = /Users/penny/gulls_fz/src
+BASEDIR = /home/johnson.7080/gulls/src
 
 
 FFLAGS  = -O2 -Wall
